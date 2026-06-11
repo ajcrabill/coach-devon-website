@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API = "/api";
+import { api } from "./api";
 
 type Stats = {
   districts: number; people: number; superintendents: number;
@@ -33,16 +32,16 @@ export default function Crm() {
   const [sel, setSel] = useState<DistrictD | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
-  useEffect(() => { fetch(`${API}/crm/stats`).then(r => r.json()).then(setStats).catch(e => setErr(String(e))); }, []);
+  useEffect(() => { api(`/crm/stats`).then(r => r.json()).then(setStats).catch(e => setErr(String(e))); }, []);
 
   useEffect(() => {
     const p = new URLSearchParams({ page: String(page), page_size: "50" });
     if (q) p.set("q", q); if (state) p.set("state", state); if (band) p.set("band", band);
-    fetch(`${API}/crm/districts?${p}`).then(r => r.json()).then(d => { setRows(d.districts); setTotal(d.total); }).catch(e => setErr(String(e)));
+    api(`/crm/districts?${p}`).then(r => r.json()).then(d => { setRows(d.districts); setTotal(d.total); }).catch(e => setErr(String(e)));
   }, [q, state, band, page]);
 
   const openDistrict = (id: string) =>
-    fetch(`${API}/crm/districts/${id}`).then(r => r.json()).then(setSel);
+    api(`/crm/districts/${id}`).then(r => r.json()).then(setSel);
 
   return (
     <div style={s.page}>
