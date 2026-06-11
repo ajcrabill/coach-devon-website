@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Unsubscribe — Effective School Boards</title>
+  <style>
+    body { font-family: -apple-system, Arial, sans-serif; color: #222; background: #fff;
+           max-width: 520px; margin: 0 auto; padding: 80px 24px; text-align: center; }
+    h1 { font-size: 20px; font-weight: 600; }
+    p { color: #555; line-height: 1.6; }
+    .muted { color: #999; font-size: 13px; margin-top: 28px; }
+  </style>
+</head>
+<body>
+  <h1>Effective School Boards</h1>
+  <div id="msg"><p>One moment…</p></div>
+  <p class="muted">512 W MLK #266, Austin, TX 78701</p>
+  <script>
+    var API = "https://esbcloud.taild49f53.ts.net:8443";
+    var t = new URLSearchParams(location.search).get("t");
+    var msg = document.getElementById("msg");
+    function fail() {
+      msg.innerHTML = "<p>We couldn't process that automatically. Please reply to the email with “unsubscribe” and we'll take care of it.</p>";
+    }
+    if (!t) { fail(); }
+    else {
+      fetch(API + "/leadgen/unsubscribe/" + encodeURIComponent(t))
+        .then(function (r) {
+          if (r.ok) {
+            msg.innerHTML = "<p>You've been unsubscribed.</p><p>You will receive no further emails from Effective School Boards. Thank you.</p>";
+          } else { fail(); }
+        })
+        .catch(fail);
+    }
+  </script>
+</body>
+</html>
