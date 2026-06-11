@@ -11,8 +11,8 @@ type DistrictRow = {
   enrollment: number | null; band: string; cgcs_member: boolean | null;
   website: string; people_count: number;
 };
-type Email = { email: string; status: string; source: string };
-type PersonD = { id: string; role: string; name: string; title: string; emails: Email[] };
+type Email = { email: string; status: string; source: string; last_checked: string | null };
+type PersonD = { id: string; role: string; name: string; title: string; status: string; last_seen_at: string | null; departed_at: string | null; emails: Email[] };
 type DistrictD = DistrictRow & {
   nces_lea_id: string | null; zip: string; street: string; phone: string;
   county: string; locale: string; district_type: string; operational_schools: number | null;
@@ -112,14 +112,27 @@ export default function Crm() {
               <M l="NCES" v={sel.nces_lea_id || "—"} />
             </div>
             {sel.website && <a style={s.link} href={sel.website.startsWith("http") ? sel.website : `http://${sel.website}`} target="_blank">{sel.website}</a>}
-            <h3 style={s.h3}>People ({sel.people.length})</h3>
-            {sel.people.map(p => (
-              <div key={p.id} style={s.person}>
+            <h3 style={s.h3}>People ({sel.people.filter(p => p.status !== "former").length} current
+              {sel.people.some(p => p.status === "former") && <span style={s.dim}> · {sel.people.filter(p => p.status === "former").length} former</span>})</h3>
+            {sel.people.map(p => {
+              const e0 = p.emails[0];
+              const verified = e0 && (e0.status === "verified");
+              return (
+              <div key={p.id} style={{ ...s.person, opacity: p.status === "former" ? 0.45 : 1 }}>
                 <span style={p.role === "superintendent" ? s.supt : s.boardTag}>{p.role === "superintendent" ? "SUPT" : "BOARD"}</span>
-                <span style={s.pname}>{p.name}</span>
-                <span style={s.pemail}>{p.emails.map(e => e.email).join(", ") || <em style={s.dim}>no email</em>}</span>
+                <span style={s.pname}>
+                  {p.name}
+                  {p.status === "former" && <span style={s.former}>FORMER</span>}
+                </span>
+                <span style={s.pemail}>
+                  {p.emails.map(e => e.email).join(", ") || <em style={s.dim}>no email</em>}
+                  {e0 && <span style={verified ? s.vok : s.vmx}>
+                    {verified ? "site-verified" : e0.status}
+                    {e0.last_checked ? ` · ${e0.last_checked.slice(0, 10)}` : " · never checked"}
+                  </span>}
+                </span>
               </div>
-            ))}
+            ); })}
           </div>
         </div>
       )}
@@ -164,4 +177,7 @@ const s: Record<string, React.CSSProperties> = {
   supt: { background: "#1d3a2a", color: "#7ee2a8", fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 700, textAlign: "center" },
   boardTag: { background: "#1f2a3a", color: "#8fb6ff", fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 700, textAlign: "center" },
   pname: { fontSize: 14 }, pemail: { gridColumn: "2", fontSize: 12, color: "#9aa3b2", fontFamily: "ui-monospace, monospace" },
+  former: { marginLeft: 8, fontSize: 9, fontWeight: 700, color: "#e0a458", background: "#3a2a14", padding: "1px 5px", borderRadius: 3, letterSpacing: 0.5 },
+  vok: { display: "block", marginTop: 2, fontSize: 10, color: "#7ee2a8" },
+  vmx: { display: "block", marginTop: 2, fontSize: 10, color: "#5b6472" },
 };
