@@ -123,7 +123,7 @@ export default function Crm() {
                 <span style={s.pname}>
                   {p.name}
                   {p.status === "former" && <span style={s.former}>FORMER</span>}
-                  {p.subscriber && <span style={s.sub}>SUBSCRIBER</span>}
+                  {p.subscriber && <span style={s.subBadge}>SUBSCRIBER</span>}
                 </span>
                 <span style={s.pemail}>
                   {p.emails.map(e => e.email).join(", ") || <em style={s.dim}>no email</em>}
@@ -179,7 +179,7 @@ const s: Record<string, React.CSSProperties> = {
   boardTag: { background: "#1f2a3a", color: "#8fb6ff", fontSize: 10, padding: "2px 6px", borderRadius: 4, fontWeight: 700, textAlign: "center" },
   pname: { fontSize: 14 }, pemail: { gridColumn: "2", fontSize: 12, color: "#9aa3b2", fontFamily: "ui-monospace, monospace" },
   former: { marginLeft: 8, fontSize: 9, fontWeight: 700, color: "#e0a458", background: "#3a2a14", padding: "1px 5px", borderRadius: 3, letterSpacing: 0.5 },
-  sub: { marginLeft: 8, fontSize: 9, fontWeight: 700, color: "#7ee2a8", background: "#15301f", padding: "1px 5px", borderRadius: 3, letterSpacing: 0.5 },
+  subBadge: { marginLeft: 8, fontSize: 9, fontWeight: 700, color: "#7ee2a8", background: "#15301f", padding: "1px 5px", borderRadius: 3, letterSpacing: 0.5 },
   vok: { display: "block", marginTop: 2, fontSize: 10, color: "#7ee2a8" },
   vmx: { display: "block", marginTop: 2, fontSize: 10, color: "#5b6472" },
 };
