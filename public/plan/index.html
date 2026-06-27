@@ -534,12 +534,39 @@ function setError(id, msg) {
   el.textContent = msg;
   msg ? el.classList.remove("hidden") : el.classList.add("hidden");
 }
-function setLoading(btnId, loading, defaultLabel) {
+function setLoading(btnId, loading, defaultLabel, loadingLabel) {
   const btn = document.getElementById(btnId);
   btn.disabled = loading;
   btn.innerHTML = loading
-    ? '<span class="spinner"></span> Working…'
+    ? `<span class="spinner"></span> ${loadingLabel || "Working…"}`
     : defaultLabel;
+}
+
+let _researchTimer = null;
+const _RESEARCH_PHASES = [
+  "Searching for evidence-based research…",
+  "Gathering leading-indicator data…",
+  "Research expert brainstorming…",
+  "Governance & equity expert brainstorming…",
+  "Synthesizing council findings…",
+  "Drafting your strategic plan…",
+];
+function startResearchStatus(btnId, defaultLabel) {
+  let i = 0;
+  const btn = document.getElementById(btnId);
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> ${_RESEARCH_PHASES[0]}`;
+  _researchTimer = setInterval(() => {
+    i = Math.min(i + 1, _RESEARCH_PHASES.length - 1);
+    if (btn.disabled) btn.innerHTML = `<span class="spinner"></span> ${_RESEARCH_PHASES[i]}`;
+  }, 10000);
+}
+function stopResearchStatus(btnId, defaultLabel) {
+  clearInterval(_researchTimer);
+  _researchTimer = null;
+  const btn = document.getElementById(btnId);
+  btn.disabled = false;
+  btn.innerHTML = defaultLabel;
 }
 
 /* ── Stage 1 → analyze ───────────────────────────────────────────────── */
@@ -628,7 +655,7 @@ async function runGenerateWith(answers) {
   const btnId  = _questions.length === 0 ? "analyze-btn"  : "generate-btn";
   const label  = _questions.length === 0 ? "Continue"      : "Generate Strategic Plan";
 
-  setLoading(btnId, true, label);
+  startResearchStatus(btnId, label);
   try {
     const res = await fetch(`${API}/plan/generate`, {
       method: "POST",
@@ -648,7 +675,7 @@ async function runGenerateWith(answers) {
   } catch (e) {
     setError(errId, e.message || "Something went wrong. Please try again.");
   } finally {
-    setLoading(btnId, false, label);
+    stopResearchStatus(btnId, label);
   }
 }
 
